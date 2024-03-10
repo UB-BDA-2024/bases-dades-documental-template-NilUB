@@ -13,7 +13,7 @@ class MongoDBClient:
     
     def ping(self):
         return self.client.db_name.command('ping')
-    
+    # Aquest métode sera el important, ens permetra rebre la instancia!
     def getDatabase(self, database):
         self.database = self.client[database]
         return self.database

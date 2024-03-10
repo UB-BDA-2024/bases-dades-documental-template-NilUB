@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typping import Optional
 
 class Sensor(BaseModel):
     id: int
@@ -29,9 +30,10 @@ class SensorCreate(BaseModel):
     serie_number: str
     firmware_version: str
 
+# Aqui podem afegir Optional a alguns atributs, pero important no a tots
 class SensorData(BaseModel):
-    velocity: float
-    temperature: float
-    humidity: float
+    velocity: Optional[float] = None
+    temperature: Optional[float] = None
+    humidity: Optional[float] = None
     battery_level: float
     last_seen: str
