@@ -40,10 +40,14 @@ router = APIRouter(
 
 
 # 🙋🏽‍♀️ Add here the route to get a list of sensors near to a given location
+# redis: RedisClient, mongo: MongoDBClient, db: Session, latitude: float, longitude: float, radius: int) -> List[SensorNear]:
 @router.get("/near")
-def get_sensors_near(latitude: float, longitude: float, db: Session = Depends(get_db),mongodb_client: MongoDBClient = Depends(get_mongodb_client)):
-    raise HTTPException(status_code=404, detail="Not implemented")
-    #return repository.get_sensors_near(mongodb=mongodb_client, latitude=latitude, longitude=longitude)
+def get_sensors_near(redis: RedisClient, latitude: float, longitude: float, radius: int, mongodb_client: MongoDBClient = Depends(get_mongodb_client), db: Session = Depends(get_db)):
+    db_sensors = repository.get_sensors_near(redis = redis, mongodb=mongodb_client, latitude=latitude, longitude=longitude, radius=radius)
+    if db_sensors == None:
+        raise HTTPException(status_code=404, detail="Error, no hi ha sensors a prop!")
+    return db_sensors
+    
 
 
 # 🙋🏽‍♀️ Add here the route to get all sensors

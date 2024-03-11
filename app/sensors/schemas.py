@@ -37,3 +37,16 @@ class SensorData(BaseModel):
     humidity: Optional[float] = None
     battery_level: float
     last_seen: str
+
+# Clase experimental
+    
+class SensorNear(BaseModel):
+    id: int
+    name: str
+    latitude: float
+    longitude: float
+    velocity: Optional[float] = None
+    temperature: Optional[float] = None
+    humidity: Optional[float] = None
+    battery_level: float
+    last_seen: str
