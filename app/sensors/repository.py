@@ -60,13 +60,13 @@ def delete_sensor(db: Session, sensor_id: int, mongodb: MongoDBClient, redis: Re
 # OJO -> response = client.get("/sensors/near?latitude=1.0&longitude=1.0&radius=1") TEST
 # Aleshores hem de posar radius a la capcelera, dono per sentat que sera un int
 
-def get_sensors_near(mongo: MongoDBClient, latitude: float, longitude: float, radius: float, redis: RedisClient, db: Session):
+def get_sensors_near(mongo: MongoDBClient, latitude: float, longitude: float, radius: int, redis: RedisClient, db: Session):
     response = []
 
     # Segons el radi establert
     my_query = {
         "latitude": {"$gte": latitude - radius, "$lte": latitude + radius},
-        "longitud": {"$gte": longitude - radius, "$lte" : longitude + radius}
+        "longitude": {"$gte": longitude - radius, "$lte": longitude + radius}
     }
 
     # I ara amb el find recuperem les dades, que compleixin la condició
