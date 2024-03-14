@@ -6,7 +6,7 @@ class MongoDBClient:
         self.port = port
         self.client = MongoClient(host, port)
         # Modifiquem això perquè no sigui None
-        self.database = self.client["database"]
+        self.database = self.client["MongoDB_"]
         self.collection = self.database["sensors"]
 
     def close(self):
