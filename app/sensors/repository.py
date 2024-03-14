@@ -63,6 +63,7 @@ def delete_sensor(db: Session, sensor_id: int, mongodb: MongoDBClient, redis: Re
 def get_sensors_near(mongo: MongoDBClient, latitude: float, longitude: float, radius: int, redis: RedisClient, db: Session):
     response = []
 
+    # El error estava aqui!
     # Segons el radi establert
     my_query = {
         "latitude": {"$gte": latitude - radius, "$lte": latitude + radius},
