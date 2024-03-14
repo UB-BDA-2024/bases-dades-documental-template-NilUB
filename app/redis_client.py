@@ -13,6 +13,7 @@ class RedisClient:
     def ping(self):
         return self._client.ping()
     
+    # Métodes afegits per el professorat, per fer accions diverses
     def get(self, key):
         return self._client.get(key)
     
