@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typping import Optional
+from typing import Optional
 
 class Sensor(BaseModel):
     id: int
@@ -38,8 +38,8 @@ class SensorData(BaseModel):
     battery_level: float
     last_seen: str
 
-# Clase experimental
-    
+# Clase experimental (Al final no l'he usat)
+'''  
 class SensorNear(BaseModel):
     id: int
     name: str
@@ -50,3 +50,4 @@ class SensorNear(BaseModel):
     humidity: Optional[float] = None
     battery_level: float
     last_seen: str
+'''

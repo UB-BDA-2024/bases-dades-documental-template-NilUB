@@ -41,13 +41,13 @@ router = APIRouter(
 
 # 🙋🏽‍♀️ Add here the route to get a list of sensors near to a given location
 # redis: RedisClient, mongo: MongoDBClient, db: Session, latitude: float, longitude: float, radius: int) -> List[SensorNear]:
+
 @router.get("/near")
-def get_sensors_near(redis: RedisClient, latitude: float, longitude: float, radius: int, mongodb_client: MongoDBClient = Depends(get_mongodb_client), db: Session = Depends(get_db)):
-    db_sensors = repository.get_sensors_near(redis = redis, mongodb=mongodb_client, latitude=latitude, longitude=longitude, radius=radius)
-    if db_sensors == None:
+def get_sensors_near(latitude: float, longitude: float, radius: int, mongodb_client: MongoDBClient = Depends(get_mongodb_client), redis_client: RedisClient = Depends(get_redis_client) ,db: Session = Depends(get_db)):
+    db_sensors_near = repository.get_sensors_near(redis = redis_client, mongo=mongodb_client, latitude=latitude, longitude=longitude, radius=radius, db=db)
+    if db_sensors_near == None:
         raise HTTPException(status_code=404, detail="Error, no hi ha sensors a prop!")
-    return db_sensors
-    
+    return db_sensors_near
 
 
 # 🙋🏽‍♀️ Add here the route to get all sensors
@@ -60,10 +60,10 @@ def get_sensors(db: Session = Depends(get_db)):
 @router.post("")
 def create_sensor(sensor: schemas.SensorCreate, db: Session = Depends(get_db), mongodb_client: MongoDBClient = Depends(get_mongodb_client)):
     db_sensor = repository.get_sensor_by_name(db, sensor.name)
-    if db_sensor:
+    if db_sensor: # si existeix...
         raise HTTPException(status_code=400, detail="Sensor with same name already registered")
-    raise HTTPException(status_code=404, detail="Not implemented")
-#    return repository.create_sensor(db=db, sensor=sensor)
+    
+    return repository.create_sensor(db=db, sensor=sensor, mongo=mongodb_client)
 
 # 🙋🏽‍♀️ Add here the route to get a sensor by id
 @router.get("/{sensor_id}")
@@ -75,22 +75,34 @@ def get_sensor(sensor_id: int, db: Session = Depends(get_db), mongodb_client: Mo
 
 # 🙋🏽‍♀️ Add here the route to delete a sensor
 @router.delete("/{sensor_id}")
-def delete_sensor(sensor_id: int, db: Session = Depends(get_db), mongodb_client: MongoDBClient = Depends(get_mongodb_client)):
+def delete_sensor(sensor_id: int, db: Session = Depends(get_db), mongodb_client: MongoDBClient = Depends(get_mongodb_client), redisdb_client : RedisClient = Depends(get_redis_client)):
     db_sensor = repository.get_sensor(db, sensor_id)
     if db_sensor is None:
         raise HTTPException(status_code=404, detail="Sensor not found")
-    raise HTTPException(status_code=404, detail="Not implemented")
- #   return repository.delete_sensor(db=db, sensor_id=sensor_id)
+    
+    return repository.delete_sensor(db=db, sensor_id=sensor_id, mongodb= mongodb_client, redis=redisdb_client)
     
 
 # 🙋🏽‍♀️ Add here the route to update a sensor
 @router.post("/{sensor_id}/data")
-def record_data(sensor_id: int, data: schemas.SensorData,db: Session = Depends(get_db) ,redis_client: RedisClient = Depends(get_redis_client)):
-    raise HTTPException(status_code=404, detail="Not implemented")
-    #return repository.record_data(redis=redis_client, sensor_id=sensor_id, data=data)
+def record_data(sensor_id: int, data: schemas.SensorData,db: Session = Depends(get_db) ,redis_client: RedisClient = Depends(get_redis_client)): 
+    db_sensor = repository.get_sensor(db, sensor_id)
+    if db_sensor is None:
+        raise HTTPException(status_code=404, detail="Sensor not found")
+    return repository.record_data(redis=redis_client, sensor_id=sensor_id, data=data)
 
 # 🙋🏽‍♀️ Add here the route to get data from a sensor
 @router.get("/{sensor_id}/data")
-def get_data(sensor_id: int, data: schemas.SensorData, db: Session = Depends(get_db) ,redis_client: RedisClient = Depends(get_redis_client)):    
-    raise HTTPException(status_code=404, detail="Not implemented")
-    #return repository.get_data(redis=redis_client, sensor_id=sensor_id, data=data)
+def get_data(sensor_id: int, db: Session = Depends(get_db) ,redis_client: RedisClient = Depends(get_redis_client)):    
+    db_sensor = repository.get_sensor(db, sensor_id)
+    if db_sensor is None:
+        raise HTTPException(status_code=404, detail="Sensor not found")
+    
+    sensor_data_in_db = repository.get_data(redis_client, sensor_id)
+
+    db_data={
+        'id': db_sensor.id,
+        'name': db_sensor.name
+    }
+    db_data.update(sensor_data_in_db)
+    return db_data
