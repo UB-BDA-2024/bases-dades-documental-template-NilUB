@@ -32,5 +32,5 @@ class MongoDBClient:
         return self.collection.insert_one(doc)
     
     # Per borrar
-    def deleteDocument(self, doc):
+    def deleteDocument(self, name):
         return self.collection.delete_one({'name': name})
