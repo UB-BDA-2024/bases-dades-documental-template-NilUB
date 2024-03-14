@@ -43,8 +43,8 @@ router = APIRouter(
 # redis: RedisClient, mongo: MongoDBClient, db: Session, latitude: float, longitude: float, radius: int) -> List[SensorNear]:
 
 @router.get("/near")
-def get_sensors_near(latitude: float, longitude: float, radius: int, mongodb_client: MongoDBClient = Depends(get_mongodb_client), redis_client: RedisClient = Depends(get_redis_client) ,db: Session = Depends(get_db)):
-    db_sensors_near = repository.get_sensors_near(redis = redis_client, mongo=mongodb_client, latitude=latitude, longitude=longitude, radius=radius, db=db)
+def get_sensors_near(latitude: float, longitude: float, radius: float, db: Session = Depends(get_db), mongodb_client: MongoDBClient = Depends(get_mongodb_client), redis_client: RedisClient = Depends(get_redis_client)):
+    db_sensors_near = repository.get_sensors_near(mongo=mongodb_client, latitude=latitude, longitude=longitude, radius=radius, redis=redis_client, db=db)
     if db_sensors_near == None:
         raise HTTPException(status_code=404, detail="Error, no hi ha sensors a prop!")
     return db_sensors_near
